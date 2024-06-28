@@ -11,5 +11,7 @@ class User < ActiveRecord::Base
   validates :phone, presence: true
   validates :birthday, presence: true
 
+  has_many :tweets, dependent: :destroy
+
   include DeviseTokenAuth::Concerns::User
 end
