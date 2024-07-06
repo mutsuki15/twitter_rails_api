@@ -1,8 +1,6 @@
 # frozen_string_literal: true
 
 class User < ActiveRecord::Base
-  before_create :default_header
-  before_create :default_icon
   # Include default devise modules. Others available are:
   # :confirmable, :lockable, :timeoutable, :trackable and :omniauthable
   devise :database_authenticatable, :registerable,

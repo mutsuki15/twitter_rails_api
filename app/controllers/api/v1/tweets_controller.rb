@@ -8,6 +8,13 @@ class Api::V1::TweetsController < ApplicationController
            status: :ok
   end
 
+  def show
+    tweet = Tweet.convert_hash_data([Tweet.find(params[:id])])
+
+    render json: { tweet: tweet.first },
+           status: :ok
+  end
+
   def create
     new_tweet = current_api_v1_user.tweets.build(tweet_params)
     if new_tweet.save
