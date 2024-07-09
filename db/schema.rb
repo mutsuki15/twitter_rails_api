@@ -42,14 +42,6 @@ ActiveRecord::Schema[7.0].define(version: 2024_06_28_153654) do
     t.index ["blob_id", "variation_digest"], name: "index_active_storage_variant_records_uniqueness", unique: true
   end
 
-  create_table "tasks", force: :cascade do |t|
-    t.string "title", null: false
-    t.text "description", null: false
-    t.integer "status", null: false
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-  end
-
   create_table "tweets", force: :cascade do |t|
     t.bigint "user_id"
     t.string "content"
@@ -73,6 +65,9 @@ ActiveRecord::Schema[7.0].define(version: 2024_06_28_153654) do
     t.string "email", null: false
     t.string "phone", null: false
     t.date "birthday", null: false
+    t.string "bio"
+    t.string "location"
+    t.string "website"
     t.json "tokens"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false

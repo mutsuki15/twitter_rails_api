@@ -33,6 +33,9 @@ class DeviseTokenAuthCreateUsers < ActiveRecord::Migration[7.0]
       t.string :email, null: false
       t.string :phone, null: false
       t.date :birthday, null: false
+      t.string :bio
+      t.string :location
+      t.string :website
 
       ## Tokens
       t.json :tokens
