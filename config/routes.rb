@@ -3,6 +3,10 @@
 Rails.application.routes.draw do
   namespace :api do
     namespace :v1 do
+      namespace :auth do
+        resources :users, only: %i[index]
+        get 'current_user', to: 'users#current'
+      end
     resources :tweets, only: %i[index show create destroy]
     resources :images, only: %i[update]
       mount_devise_token_auth_for 'User', at: 'users', controllers: {
@@ -11,7 +15,6 @@ Rails.application.routes.draw do
       resources :users, param: :name, only: %i[show update]
     end
   end
-  resources :tasks
   mount LetterOpenerWeb::Engine, at: "/letter_opener" if Rails.env.development?
   # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html
   # Defines the root path route ("/")
