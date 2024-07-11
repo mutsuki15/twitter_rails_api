@@ -8,6 +8,7 @@ Rails.application.routes.draw do
         get 'current_user', to: 'users#current'
       end
     resources :tweets, only: %i[index show create destroy]
+    resources :comments, only: %i[create]
     resources :images, only: %i[update]
       mount_devise_token_auth_for 'User', at: 'users', controllers: {
         registrations: 'api/v1/users/registrations'
