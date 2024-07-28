@@ -1,6 +1,10 @@
 class Api::V1::TweetsController < ApplicationController
+  before_action :authenticate_api_v1_user!
+  before_action :set_tweet, only: %i[retweets]
+
   def index
-    tweets = Tweet.convert_hash_data(Tweet.not_comment.related_preload.limit_offset(offset).created_sort)
+    tweets = Tweet.convert_hash_data(Tweet.not_comment.related_preload.limit_offset(offset).created_sort,
+                                         current_api_v1_user)
     tweets_empty = Tweet.after_next_empty?(offset)
 
     render json: { tweets:, next: tweets_empty[:next_empty], after_next: tweets_empty[:after_next_empty] },
@@ -8,7 +12,7 @@ class Api::V1::TweetsController < ApplicationController
   end
 
   def show
-    tweet = Tweet.convert_hash_data([Tweet.find(params[:id])])
+    tweet = Tweet.convert_hash_data([Tweet.find(params[:id])], current_api_v1_user)
 
     render json: { tweet: tweet.first },
            status: :ok
@@ -40,10 +44,23 @@ class Api::V1::TweetsController < ApplicationController
 
   def comments
     tweet = Tweet.find(params[:id])
-    comments = Tweet.convert_hash_data(tweet.comment_tweets)
+    comments = Tweet.convert_hash_data(tweet.comment_tweets, current_api_v1_user)
 
     render json: { comments: },
            status: :ok
+  end
+
+  def retweets
+    current_user = current_api_v1_user
+      if @tweet.retweet_users.include?(current_user)
+        return unless @tweet.retweets.find_by(user_id: current_user.id).destroy
+
+        render json: { id: @tweet.id, status: :deleted }, status: :ok
+      else
+        return unless @tweet.retweets.build(user_id: current_user.id).save
+
+        render json: { id: @tweet.id, status: :created }, status: :ok
+      end
   end
 
   private
@@ -54,5 +71,9 @@ class Api::V1::TweetsController < ApplicationController
 
   def offset
     params[:page].to_i * 10
+  end
+
+  def set_tweet
+    @tweet = Tweet.find(params[:id])
   end
 end
