@@ -32,6 +32,8 @@ module Api
           user.tweets.not_comment_tweets
         when 'comments'
           user.tweets.comment_tweets
+        when 'favorites'
+          Tweet.joins(:favorites).where(favorites: { user_id: user.id })
         end
       end
     end
