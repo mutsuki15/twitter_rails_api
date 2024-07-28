@@ -29,6 +29,9 @@ class Tweet < ApplicationRecord
   has_many :retweets, dependent: :destroy
   has_many :retweet_users, through: :retweets, source: :user
 
+  has_many :favorites, dependent: :destroy
+  has_many :favorite_users, through: :favorites, source: :user
+
   def self.convert_hash_data(tweets, current_user)
     tweets.map { |tweet| tweet.hash_data(current_user) }
   end
@@ -53,14 +56,31 @@ class Tweet < ApplicationRecord
   end
 
   def tweet_action(current_user)
-    { action: { retweet: { retweeted: retweet_users.include?(current_user), count: retweets.count } } }
+    { action: {
+      retweet: retweet_action(current_user),
+      favorite: favorite_action(current_user)
+    } }
+  end
+
+  def retweet_action(current_user)
+    { retweeted: retweet_users.include?(current_user), count: retweets.count }
+  end
+
+  def favorite_action(current_user)
+    { favorited: favorite_users.include?(current_user), count: favorites.count }
   end
 
   scope :not_comment_tweets, -> { related_preload.not_comment.created_sort }
 
   scope :comment_tweets, -> { related_preload.where_comment.created_sort }
 
-  scope :related_preload, -> { with_attached_images.preload(:user).preload(parent_tweet: :user).preload(:retweets) }
+  scope :related_preload, -> { with_attached_images.load_user.load_retweets.load_favorites }
+
+  scope :load_user, -> { preload(:user, parent_tweet: :user) }
+
+  scope :load_retweets, -> { preload(:retweets, :retweet_users) }
+
+  scope :load_favorites, -> { preload(:favorites, :favorite_users) }
 
   scope :created_sort, -> { order(created_at: :desc) }
 

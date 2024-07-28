@@ -11,6 +11,7 @@ Rails.application.routes.draw do
         member do
           get :comments
           post :retweets
+          post :favorites
         end
       end
     resources :comments, only: %i[create]

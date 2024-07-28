@@ -1,6 +1,6 @@
 class Api::V1::TweetsController < ApplicationController
   before_action :authenticate_api_v1_user!
-  before_action :set_tweet, only: %i[retweets]
+  before_action :set_tweet, only: %i[retweets favorites]
 
   def index
     tweets = Tweet.convert_hash_data(Tweet.not_comment.related_preload.limit_offset(offset).created_sort,
@@ -61,6 +61,19 @@ class Api::V1::TweetsController < ApplicationController
 
         render json: { id: @tweet.id, status: :created }, status: :ok
       end
+  end
+
+  def favorites
+    current_user = current_api_v1_user
+        if @tweet.favorite_users.include?(current_user)
+          return unless @tweet.favorites.find_by(user_id: current_user.id).destroy
+
+          render json: { id: @tweet.id, status: :deleted }, status: :ok
+        else
+          return unless @tweet.favorites.build(user_id: current_user.id).save
+
+          render json: { id: @tweet.id, status: :created }, status: :ok
+        end
   end
 
   private
