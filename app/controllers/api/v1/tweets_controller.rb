@@ -1,10 +1,9 @@
 class Api::V1::TweetsController < ApplicationController
   def index
-    tweets = Tweet.convert_hash_data(Tweet.related_preload.limit_offset(offset).created_sort)
-    next_empty = Tweet.limit_offset(offset + 10).empty?
-    after_next_empty = Tweet.limit_offset(offset + 20).empty?
+    tweets = Tweet.convert_hash_data(Tweet.not_comment.related_preload.limit_offset(offset).created_sort)
+    tweets_empty = Tweet.after_next_empty?(offset)
 
-    render json: { tweets:, next: !next_empty, after_next: !after_next_empty },
+    render json: { tweets:, next: tweets_empty[:next_empty], after_next: tweets_empty[:after_next_empty] },
            status: :ok
   end
 
@@ -37,6 +36,14 @@ class Api::V1::TweetsController < ApplicationController
       render json: { status: :bad_request },
              status: :bad_request
     end
+  end
+
+  def comments
+    tweet = Tweet.find(params[:id])
+    comments = Tweet.convert_hash_data(tweet.comment_tweets)
+
+    render json: { comments: },
+           status: :ok
   end
 
   private
