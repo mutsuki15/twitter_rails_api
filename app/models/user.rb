@@ -17,6 +17,24 @@ class User < ActiveRecord::Base
   has_one_attached :icon
   has_one_attached :header
 
+  has_many(
+    :follows,
+    class_name: 'Follow',
+    foreign_key: :follower_user_id,
+    dependent: :destroy,
+    inverse_of: :follower_user
+  )
+  has_many :follow_users, through: :follows, source: :follow_user
+
+  has_many(
+    :followers,
+    class_name: 'Follow',
+    foreign_key: :follow_user_id,
+    dependent: :destroy,
+    inverse_of: :follow_user
+  )
+  has_many :follower_users, through: :followers, source: :follower_user
+
   def icon_url
     { icon: icon.attached? ? url_for(icon) : nil }
   end
