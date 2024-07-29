@@ -5,7 +5,7 @@ module Api
         before_action :authenticate_api_v1_user!
 
         def current
-          render json: { status: true, current_user: current_api_v1_user.hash_data[:user] },
+          render json: { status: true, current_user: current_api_v1_user.hash_data(current_api_v1_user)[:user] },
                  status: :ok
         end
       end
