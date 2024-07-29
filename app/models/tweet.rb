@@ -37,7 +37,7 @@ class Tweet < ApplicationRecord
   end
 
   def hash_data(current_user, parent: true)
-    hash_data = JSON.parse(to_json).merge(image_urls).merge(user.hash_data).merge(tweet_action(current_user))
+    hash_data = JSON.parse(to_json).merge(image_urls, tweet_action(current_user), user.hash_data(current_user))
 
     hash_data.merge!({ parent: parent_tweet.hash_data(current_user, parent: false) }) if parent_tweet.present? && parent
 
