@@ -1,0 +1,2 @@
+class NoticeType < ApplicationRecord
+end
