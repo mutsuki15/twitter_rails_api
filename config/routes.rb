@@ -16,6 +16,7 @@ Rails.application.routes.draw do
       end
     resources :comments, only: %i[create]
     resources :images, only: %i[update]
+    resources :notifications, only: %i[index]
       mount_devise_token_auth_for 'User', at: 'users', controllers: {
         registrations: 'api/v1/users/registrations'
       }

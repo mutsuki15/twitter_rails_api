@@ -1,5 +1,9 @@
 class Comment < ApplicationRecord
-  attribute :notice_type_id, default: -> { NoticeType.find_by(notice_name: 'コメント').id }
+  attribute :notice_type_id, default: -> {
+    notice_type = NoticeType.find_or_create_by!(notice_name: 'コメント')
+    notice_type.id
+  }
+  
   before_create :comment_notice
 
   belongs_to :parent_tweet, class_name: 'Tweet'
@@ -12,10 +16,10 @@ class Comment < ApplicationRecord
     return if noticed_user_id == notice_user_id
 
     Notice.create!(
-      noticed_user_id:,
-      notice_user_id:,
+      noticed_user_id: noticed_user_id,
+      notice_user_id: notice_user_id,
       tweet_id: Tweet.find(comment_tweet_id).id,
-      notice_type_id:
+      notice_type_id: notice_type_id
     )
   end
 end

@@ -1,5 +1,8 @@
 class Favorite < ApplicationRecord
-  attribute :notice_type_id, default: -> { NoticeType.find_by(notice_name: 'いいね').id }
+  attribute :notice_type_id, default: -> {
+    notice_type = NoticeType.find_or_create_by!(notice_name: 'いいね')
+    notice_type.id
+  }
   before_create :favorite_notice
 
   belongs_to :tweet
@@ -11,10 +14,10 @@ class Favorite < ApplicationRecord
     return if noticed_user_id == user_id
 
     Notice.create!(
-      noticed_user_id:,
+      noticed_user_id: noticed_user_id,
       notice_user_id: user_id,
-      tweet_id:,
-      notice_type_id:
+      tweet_id: tweet_id,
+      notice_type_id: notice_type_id
     )
   end
 end
