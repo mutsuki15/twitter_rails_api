@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2024_07_29_131537) do
+ActiveRecord::Schema[7.0].define(version: 2024_08_04_042325) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -47,7 +47,9 @@ ActiveRecord::Schema[7.0].define(version: 2024_07_29_131537) do
     t.bigint "comment_tweet_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.bigint "notice_type_id"
     t.index ["comment_tweet_id"], name: "index_comments_on_comment_tweet_id"
+    t.index ["notice_type_id"], name: "index_comments_on_notice_type_id"
     t.index ["parent_tweet_id"], name: "index_comments_on_parent_tweet_id"
   end
 
@@ -56,6 +58,8 @@ ActiveRecord::Schema[7.0].define(version: 2024_07_29_131537) do
     t.bigint "user_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.bigint "notice_type_id"
+    t.index ["notice_type_id"], name: "index_favorites_on_notice_type_id"
     t.index ["tweet_id"], name: "index_favorites_on_tweet_id"
     t.index ["user_id"], name: "index_favorites_on_user_id"
   end
@@ -65,8 +69,29 @@ ActiveRecord::Schema[7.0].define(version: 2024_07_29_131537) do
     t.bigint "follower_user_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.bigint "notice_type_id"
     t.index ["follow_user_id"], name: "index_follows_on_follow_user_id"
     t.index ["follower_user_id"], name: "index_follows_on_follower_user_id"
+    t.index ["notice_type_id"], name: "index_follows_on_notice_type_id"
+  end
+
+  create_table "notice_types", force: :cascade do |t|
+    t.string "notice_name"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
+  create_table "notices", force: :cascade do |t|
+    t.bigint "noticed_user_id"
+    t.bigint "notice_user_id"
+    t.bigint "tweet_id"
+    t.bigint "notice_type_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["notice_type_id"], name: "index_notices_on_notice_type_id"
+    t.index ["notice_user_id"], name: "index_notices_on_notice_user_id"
+    t.index ["noticed_user_id"], name: "index_notices_on_noticed_user_id"
+    t.index ["tweet_id"], name: "index_notices_on_tweet_id"
   end
 
   create_table "retweets", force: :cascade do |t|
@@ -74,6 +99,8 @@ ActiveRecord::Schema[7.0].define(version: 2024_07_29_131537) do
     t.bigint "user_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.bigint "notice_type_id"
+    t.index ["notice_type_id"], name: "index_retweets_on_notice_type_id"
     t.index ["tweet_id"], name: "index_retweets_on_tweet_id"
     t.index ["user_id"], name: "index_retweets_on_user_id"
   end
@@ -120,4 +147,6 @@ ActiveRecord::Schema[7.0].define(version: 2024_07_29_131537) do
   add_foreign_key "comments", "tweets", column: "parent_tweet_id"
   add_foreign_key "follows", "users", column: "follow_user_id"
   add_foreign_key "follows", "users", column: "follower_user_id"
+  add_foreign_key "notices", "users", column: "notice_user_id"
+  add_foreign_key "notices", "users", column: "noticed_user_id"
 end
