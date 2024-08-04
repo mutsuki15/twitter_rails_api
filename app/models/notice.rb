@@ -16,6 +16,8 @@ class Notice < ApplicationRecord
       { id:, type: 'コメント', tweet: tweet.hash_data(current_user) }
     when 'フォロー'
       { id:, type: 'フォロー', user: notice_user.hash_data(current_user)[:user] }
+    when 'リツイート'
+      { id:, type: 'リツイート', tweet: JSON.parse(tweet.to_json), user: notice_user.hash_data(current_user)[:user] }
     end
   end
 
